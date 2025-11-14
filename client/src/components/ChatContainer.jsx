@@ -22,6 +22,19 @@ const handleSendMessage = async (e)=>{
 }
 
 //handle sending an img
+const handleSendImage = async (e)=>{
+  const file = e.target.files[0];
+  if(!file || !file.type.startWith("image/")) {
+    toast.error("Please select a valid image file");
+    return; 
+  }
+  const reader = new FileReader();
+  reader.onloadend = async()=>{
+    await sendMessage({image:reader.result});
+    e.target.value = "";
+  };
+  reader.readAsDataURL(file);
+}
 
 
 
