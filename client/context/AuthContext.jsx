@@ -57,6 +57,23 @@ const logout = ()=>{
 }
 
 
+//update rofile func to HaNDELE profile updates
+const updateProfile = async (body)=>{
+    try{    
+        const {data} = await axios.put("/api/auth/update-profile",body);
+        if(data.success){
+            setAuthUser(data.user);
+            toast.success("profile updated successfully");
+        }else{
+            toast.error(data.message);
+        }
+    }catch(error){
+        toast.error(error.message);
+    }
+}
+
+
+
 
 //conct socket func to handle socket v=conn and online user updates
 
@@ -86,7 +103,10 @@ newSocket.on("getOnlineUsers",(userIds)=>{
         axios,
         authUser,
         onlineUsers,
-        socket
+        socket,
+        login,
+        logout,
+        updateProfile
     }
     return(
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
