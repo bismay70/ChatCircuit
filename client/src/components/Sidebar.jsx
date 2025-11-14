@@ -1,9 +1,26 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import assets, { userDummyData } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 
-const Sidebar = ({selectedUser,setSelectedUser}) => {
+const Sidebar = () => {
+
+
+    const {selectedUser,setSelectedUser,getUsers,users,unseenMessages,setUnseenMessages} = useContext(ChatContext);
+
+    const filteredUsers = input ? users.filter((user)=> user.fullName.toLowerCase().includes(input.toLowerCase())) : users;
+
+const {logout,onlineUsers} = useContext(AuthContext);
+const {input,setInput} = useState(false);
+
     const navigate = useNavigate();
+
+
+
+    useEffect(()=>{
+    getUsers();
+    },[onlineUsers])
+
+
   return (
     <div className={`bg-[#8185B2]/10 h-full p-5 rounded-r-xl overflow-y-scroll text-white ${selectedUser ? 'hidden md:block' : ''}`}>
     <div className="pb-5">
