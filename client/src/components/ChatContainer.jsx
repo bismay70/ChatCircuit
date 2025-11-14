@@ -2,9 +2,29 @@ import React,{useRef,useEffect} from 'react'
 import assets, { messagesDummyData } from '../assets/assets';
 import { formatMessageTime } from '../lib/utils';
 
-const ChatContainer = ({selectedUser,setSelectedUser}) => {
+const ChatContainer = () => {
+
+  const {selectedUser,setSelectedUser,messages,sendMessage,getMessages} = useContext(ChatContext);
+
+  const {authUser,onlineUsers} = useContext(AuthContext)
 
   const scrollEnd = useRef();
+
+const [input,setInput] = useState("");
+
+
+//handle sending a msg
+const handleSendMessage = async (e)=>{
+  e.preventDefault();
+  if(input.trim() === "") return null;
+  await sendMessage({text:input.trim()});
+  setInput("");
+}
+
+//handle sending an img
+
+
+
   useEffect(() => {
     if(scrollEnd.current){
       scrollEnd.current.scrollIntoView({behavior:"smooth"})
