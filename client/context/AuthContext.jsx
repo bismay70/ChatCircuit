@@ -46,7 +46,15 @@ const login = async (state,credentials) =>{
 }
 
 //logout func
-
+const logout = ()=>{
+    setAuthUser(null);
+    localStorage.removeItem("token");
+    sdetToken(null)
+    setOnlineUsers([]);
+    axios.defaults.headers.common["token"]=null;
+    toast.success("Logged out successfully");
+    socket.disconnect();
+}
 
 
 
