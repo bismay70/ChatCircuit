@@ -136,10 +136,3 @@ Contributions are welcome — open an issue or submit a pull request. Suggested 
 Add a LICENSE file (MIT is a common choice) if you plan to publish this repository.
 
 ---
-
-If you want, I can:
-
-- Add example screenshot files to `client/public/screenshots` and a small `.gitkeep` placeholder
-- Inject a small `README` snapshot into the `client` README linking back to this root README
-
-Tell me which you'd prefer and I'll implement it. ✨
