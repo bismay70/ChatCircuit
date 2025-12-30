@@ -1,6 +1,11 @@
-# ChatAPP 💬
+# ChatApp = ChatCircuit💬
 
 A full-stack real-time chat application built with React (Vite) on the frontend and Express + MongoDB + Socket.io on the backend. It supports authentication (signup/login), real-time messaging (text and images), profile updates, online presence indicators, and an intuitive sidebar + message pane layout.
+
+---
+<p align="center">
+  <img src="" alt="Project screenshot" width="800" style="max-width:100%;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.15)" />
+</p>
 
 ---
 
