@@ -3,16 +3,18 @@ import axios from "axios";
 import  toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const backendUrl = import.meta.env.VITE_BACKENDUrl;
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 axios.default.baseURL=backendUrl;
 
 export const AuthContext = createContext(); 
 
-export const AuthContextProvider = ({children})=>{
-    const [token,sdetToken] = useState(localStorage.getItem("token") );
+export const AuthProvider = ({children})=>{
+    const [token,setToken] = useState(localStorage.getItem("token") );
     const [authUser,setAuthUser] = useState(null);
     const [onlineUsers,setOnlineUsers] = useState([]);
     const [socket,setSocket] = useState(null);
+
+// check if user authenticated and if so, seet user data and connct socket
 
     const checkAuth = async()=>{
         try{
@@ -49,7 +51,7 @@ const login = async (state,credentials) =>{
 const logout = ()=>{
     setAuthUser(null);
     localStorage.removeItem("token");
-    sdetToken(null)
+    setToken(null);
     setOnlineUsers([]);
     axios.defaults.headers.common["token"]=null;
     toast.success("Logged out successfully");
@@ -57,7 +59,7 @@ const logout = ()=>{
 }
 
 
-//update rofile func to HaNDELE profile updates
+//update profile func to HaNDELE profile updates
 const updateProfile = async (body)=>{
     try{    
         const {data} = await axios.put("/api/auth/update-profile",body);
@@ -73,12 +75,10 @@ const updateProfile = async (body)=>{
 }
 
 
-
-
 //conct socket func to handle socket v=conn and online user updates
 
 const connectSocket = (userData)=>{
-if(!userData || socket?connected) return;
+if(!userData || socket?.connected) return;
 const newSocket = io(backendUrl,{
     query:{
         userId: userData._id,
@@ -109,6 +109,8 @@ newSocket.on("getOnlineUsers",(userIds)=>{
         updateProfile
     }
     return(
-        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
     )
 }

@@ -1,6 +1,10 @@
 import React, { useEffect } from 'react'
 import assets, { userDummyData } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
+import { useContext } from 'react'
+import { ChatContext } from '../../context/ChatContext'
+import { AuthContext } from '../../context/AuthContext'
+import { useState } from 'react'
 
 const Sidebar = () => {
 
