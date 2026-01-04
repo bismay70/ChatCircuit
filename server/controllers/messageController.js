@@ -30,7 +30,7 @@ res.json({success:false,message:error.message})
 
 
 // get all msgs for selcted users
-export const getMesssages =  async (req,res)=>{
+export const getMessages =  async (req,res)=>{
     try{
         const {id:selectedUserId}=req.params;
         const myId = req.user._id;
