@@ -60,7 +60,7 @@ const LoginPage = () => {
             <p>Agree to terms of use and privacy </p>
         </div>
 
-        <div>
+        <div className='flex flex-col gap-2'>
             {currState === 'Sign Up' ? (
                 <p className='text-sm text-gray-300'>Already have an account? <span onClick={()=>{setCurrState('Login'); setIsDataSubmited(false)}} className='text-purple-400 cursor-pointer'>Login</span></p>
             ) : (

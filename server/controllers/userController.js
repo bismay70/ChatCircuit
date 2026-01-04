@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs"
 import cloudinary from "../lib/cloudinary.js"
 
 //sign up new usr
-export const signup = async (requestAnimationFrame,res)=>{
+export const signup = async (req,res)=>{
     const {fullName,email,password,bio} = req.body;
     try{
         if(!fullName || !email || !password || !bio){
@@ -30,19 +30,19 @@ export const signup = async (requestAnimationFrame,res)=>{
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        const userData = await User.findOne({ email });
 
-        if (!user) {
+        if (!userData) {
             return res.json({ success: false, message: "Invalid credentials" });
         }
 
-        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        const isPasswordCorrect = await bcrypt.compare(password, userData.password);
         if (!isPasswordCorrect) {
             return res.json({ success: false, message: "Invalid credentials" });
         }
 
-        const token = generateToken(user._id);
-        res.json({ success: true, message: "Login successful", userData: user, token });
+        const token = generateToken(userData._id);
+        res.json({ success: true, message: "Login successful",userData, token });
     } catch (error) {
         res.json({ success: false, message: error.message });
         console.log(error.message);

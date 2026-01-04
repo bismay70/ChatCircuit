@@ -4,10 +4,22 @@ import cors from "cors"
 import http from "http"
 import { connectDB } from "./lib/db.js";
 import userRouter from "./routes/userRoutes.js";
+import messageRouter from "./routes/messageRoutes.js";
+import {Server} from "socket.io";
 
 const app = express();
 const server = http.createServer(app)
 //http kyki socktio suprt this
+
+//initialize socket.io
+export const io = new Server(server,{
+  cors:{origin:"*"}
+})
+
+//store online users
+export const userSocketMap = {}; //{userId:socketId}
+
+
 
 //middlewares 
 app.use(express.json({limit:"4mb"}))
@@ -17,6 +29,9 @@ app.use(cors())
 //routes setup
 app.use("/api/status",(req,res)=>res.send("Server live"))
 app.use("/api/auth",userRouter)
+app.use("/api/messages",messageRouter);
+
+
 
 //connet to mongodb
 await connectDB()

@@ -7,8 +7,9 @@ import cloudinary from "../lib/cloudinary.js";
 export const getUsersForSidebar= async (req,res)=>{
 try{
     const userId =  req.user._id;
-    const filteredusers = await User.find({_id:{$ne:req.user._id}}).select("-password");
+    const filteredusers = await User.find({_id:{$ne:userId}}).select("-password");
 
+    // count no of unseen msgs
     const unseenMessages = {}
     const promises = filteredusers.map(async (user) => {
         const messages = await Message.find({senderId:user._id,receiverId:userId,seen:false});
