@@ -11,8 +11,8 @@ const ProfilePage = () => {
 
     const [selectedImg,setSelectedImg]=useState(null);
     const navigate = useNavigate();
-    const [name,setName]=useState('malo ddf');
-    const [bio,setBio]=useState('');
+    const [name,setName]=useState(authUser.fullName);
+    const [bio,setBio]=useState(authUser.bio);
 
     const handleSubmit= async(e) =>{
         e.preventDefault();
@@ -47,7 +47,7 @@ const ProfilePage = () => {
                     Save Profile
                 </button>
             </form>
-            <img className="max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10"src={assets.logo_icon}/>
+            <img className={`max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10 ${selectedImg && 'rounded-full'}`} src={authUser?.profilePic || assets.logo_icon}/>
         </div>
     </div>
   )

@@ -8,7 +8,6 @@ import { useState } from 'react'
 
 const Sidebar = () => {
 
-
     const {selectedUser,setSelectedUser,getUsers,users,unseenMessages,setUnseenMessages} = useContext(ChatContext);
 
     const filteredUsers = input ? users.filter((user)=> user.fullName.toLowerCase().includes(input.toLowerCase())) : users;
