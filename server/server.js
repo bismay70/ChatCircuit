@@ -19,6 +19,24 @@ export const io = new Server(server,{
 //store online users
 export const userSocketMap = {}; //{userId:socketId}
 
+//socket io connection handler
+io.on("connection",(socket)=>{
+
+    const userId = socket.handshake.query.userId;
+    console.log("user connected",userId);
+  if(userId){
+    userSocketMap[userId] = socket.id;
+  }
+//emit online sers to all connetced clients
+  io.emit("getOnlineUsers",Object.keys(userSocketMap));
+
+  socket.on("disconnect",()=>{
+    console.log("Disconnected",socket.id);
+    delete userSocketMap[userId];
+    io.emit("getOnlineUsers",Object.keys(userSocketMap));
+  })
+})
+
 
 
 //middlewares 
