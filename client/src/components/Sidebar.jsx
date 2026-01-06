@@ -45,7 +45,7 @@ const filteredUsers = input ? users.filter((user)=> user.fullName.toLowerCase().
 
     <div className='flex flex-col'>
         {filteredUsers.map((user, index) => (
-            <div key={index} onClick={() => setSelectedUser(user)} className={`relative flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-[#2e2a7465] max-sm:text-sm ${selectedUser?.__id === user._id && 'bg-[#282142]/50'}`}>
+            <div key={index} onClick={() => {setSelectedUser(user); setUnseenMessages(prev=>({...prev, [user._id]: 0}))}} className={`relative flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-[#2e2a7465] max-sm:text-sm ${selectedUser?.__id === user._id && 'bg-[#282142]/50'}`}>
                 <img src={user?.profilePic || assets.avatar_icon} className='w-[35px] aspect-[1/1] rounded-full'/>
                 <div className="flex flex-col leading-5">
                 <p>{user.fullName}</p>
