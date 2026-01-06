@@ -12,7 +12,7 @@ const RightSidebar = () => {
 
     // get all imgs feom msgs and set them to state
     useEffect(()=>{
-        const images = messages.filter(msg=>msg.img).map(msg=>msg.img);
+        const images = messages.filter(msg=>msg.image).map(msg=>msg.image);
         setMsgImages(images);
     },[messages])
 
@@ -41,7 +41,7 @@ const RightSidebar = () => {
         </div>
         </div>
 
-        <button onClick={()=>logout()} className='absolute bottom-5 left-1/2 transform -translate-x-1/2 bg-red-500 text-white text-sm px-20 py-2 rounded-full cursor-pointer bg-gradient-to-r from-purple-900 to-violet-900 border-none font-light'>
+        <button onClick={()=>logout()} className='absolute bottom-5 left-1/2 transform -translate-x-1/2 bg-red-500 text-white text-sm px-20 py-2 rounded-full cursor-pointer bg-gradient-to-r from-blue-800 to-blue-900 border-none font-light'>
             Logout
         </button>
 

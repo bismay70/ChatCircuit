@@ -11,7 +11,7 @@ A full-stack real-time chat application built with React (Vite) on the frontend 
 
 ## 🚀 Quick Overview
 
-**ChatAPP** is a lightweight, developer-friendly chat demo that demonstrates common chat app patterns: JWT-based authentication, REST APIs for user and message operations, file/image upload via Cloudinary, and realtime message delivery using Socket.io.
+**Chat-Circuit** is a lightweight, developer-friendly chat demo that demonstrates common chat app patterns: JWT-based authentication, REST APIs for user and message operations, file/image upload via Cloudinary, and realtime message delivery using Socket.io.
 
 ## ✅ Features
 

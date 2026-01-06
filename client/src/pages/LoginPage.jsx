@@ -11,6 +11,8 @@ const LoginPage = () => {
     const [password,setPassword] = useState('');    
     const [bio,setBio] = useState('');
     const [isDataSubmited,setIsDataSubmited] = useState(false);
+    const [profilePic, setProfilePic] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
 
 const {login} = useContext(AuthContext);
 
@@ -20,8 +22,36 @@ const {login} = useContext(AuthContext);
             setIsDataSubmited(true);
             return
         }
-        login(currState==="Sign Up" ? 'signup' : 'login',{fullName,email,password,bio})
+        
+        // For login, we don't need profilePic
+        if (currState === 'Login') {
+            login('login', { email, password });
+            return;
+        }
+
+        // For signup, handle profilePic (if any)
+        const signupData = {
+            fullName,
+            email,
+            password,
+            bio,
+            profilePic // This might be a base64 string or null
+        };
+        
+        login('signup', signupData);
     } 
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfilePic(reader.result);
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
   return (
     <div className="min-h-screen bg-cover bg-center flex items-center justify-center gap-8 sm:justify-evenly max-sm:flex-col backdrop-blur-xl">
@@ -50,8 +80,29 @@ const {login} = useContext(AuthContext);
 
         {
             currState === 'Sign Up' && isDataSubmited && (
-                <textarea onChange={(e)=>setBio(e.target.value)} value={bio} 
-                rows={4} className='p-2 border-gray-500 rouded-md focus:outline:none focus:ring-2 focus:ring-indigo-500 ' placeholder="provide short bio ." required></textarea>
+                <div className='flex flex-col gap-4'>
+                    <div className='flex items-center gap-4 cursor-pointer'>
+                        <label htmlFor="profile-pic-upload" className="cursor-pointer">
+                            <img 
+                                src={imagePreview || assets.avatar_icon} 
+                                alt="Profile Preview" 
+                                className="w-16 h-16 rounded-full object-cover border border-gray-500"
+                            />
+                        </label>
+                        <label htmlFor="profile-pic-upload" className="cursor-pointer text-sm text-gray-300 hover:text-white">
+                            Upload Profile Picture
+                        </label>
+                        <input 
+                            id="profile-pic-upload" 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={handleImageChange}
+                        />
+                    </div>
+                    <textarea onChange={(e)=>setBio(e.target.value)} value={bio} 
+                    rows={4} className='p-2 border-gray-500 rouded-md focus:outline:none focus:ring-2 focus:ring-indigo-500 ' placeholder="provide short bio ." required></textarea>
+                </div>
             )
         }
 
