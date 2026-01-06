@@ -27,10 +27,10 @@ export const ChatProvider = ({ children }) => {
     }
 
 
-    //func to et messages with selected user
-    const getMessages = async (id) => {
+    //func to get messages with selected user
+    const getMessages = async (userId) => {
         try {
-            const { data } = await axios.get(`/api/messages/${id}`);
+            const { data } = await axios.get(`/api/messages/${userId}`);
             if (data.success) {
                 setMessages(data.messages);
             } else {
@@ -40,6 +40,8 @@ export const ChatProvider = ({ children }) => {
             toast.error(error.message);
         }
     }
+
+    //func to send messages with selected user
 
     const sendMessage = async (messageData) => {
         try {
@@ -53,6 +55,34 @@ export const ChatProvider = ({ children }) => {
             toast.error(error.message);
         }
     }
+
+
+    // func to subscribe to msgs for slected users
+    const subscribeToMessages = async () => {
+        if(!socket) return;
+        socket.on("mewMessage",(newMessage)=>{
+            if(selectedUser && newMessage.senderId === selectedUser._id){
+                newMessage.seen = true;
+                setMessages((prevMessages) => [...prevMessages, newMessage]);
+                axios.put(`/api/messages/mark/${newMessage._id}`);
+            }else{
+                setUnseenMessages((prevUnseenMessages) => ({
+                    ...prevUnseenMessages,
+                    [newMessage.senderId]: (prevUnseenMessages[newMessage.senderId]) ? prevUnseenMessages[newMessage.senderId] + 1 : 1
+                }));
+            }
+        })
+    }
+
+    //fnc to unsubscribe form messages
+    const unsubscribeFromMessages = () => {
+        if(socket) socket.off("mewMessage");
+    }
+
+    useEffect(()=>{
+        subscribeToMessages();
+        return () => unsubscribeFromMessages();
+    },[socket,selectedUser])
 
     useEffect(() => {
         if (selectedUser) {
@@ -93,7 +123,8 @@ export const ChatProvider = ({ children }) => {
         getMessages,
         sendMessage,
         unseenMessages,
-        setUnseenMessages
+        setUnseenMessages,
+        
     }
 
     return (
