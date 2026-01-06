@@ -41,7 +41,15 @@ io.on("connection",(socket)=>{
 
 //middlewares 
 app.use(express.json({limit:"4mb"}))
-app.use(cors())
+app.use(cors({
+  origin: "https://chat-circuit-emez5qgte-bismay70s-projects.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
+app.options("*", cors());
+
 //allow all url to conect with bcknd
 
 //routes setup
