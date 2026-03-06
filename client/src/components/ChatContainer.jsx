@@ -148,7 +148,7 @@ useEffect(()=>{
   )
   : (
     <div className='flex flex-col justify-center items-center gap-2 text-gray-500'>
-      <img src="/chat.jpg" className='w-24 h-24 rounded-[30%] shadow-lg'/>
+      <img src="/chatpng.png" className='w-24 h-24'/>
       <p className="text-lg font-medium text-white">Chat anytime,anywhere</p>
       </div>
   )

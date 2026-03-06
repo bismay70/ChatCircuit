@@ -56,7 +56,7 @@ const {login} = useContext(AuthContext);
   return (
     <div className="min-h-screen bg-cover bg-center flex items-center justify-center gap-8 sm:justify-evenly max-sm:flex-col backdrop-blur-xl">
 
-    <img src="/chat.jpg" className="w-[min(30vw,250px)] rounded-[30%] shadow-2xl"/>
+    <img src="/chatpng.png" className="w-[min(30vw,250px)]"/>
 
     <form onSubmit={onSubmitHandler} className='w-96 border-2 bg-white/8 text-white border-gray-500 p-6 flex flex-col gap-6 rounded-lg shadow-lg'>
         <h2 className='font-medium text-2xl flex justify-between items-center'>

@@ -26,7 +26,7 @@ const filteredUsers = input ? users.filter((user)=> user.fullName.toLowerCase().
     <div className={`bg-[#8185B2]/10 h-full p-5 rounded-r-xl overflow-y-scroll text-white ${selectedUser ? 'hidden md:block' : ''}`}>
     <div className="pb-5">
         <div className="flex items-center justify-between">
-            <img src="/chat.jpg" className='w-12 h-12 rounded-[30%]'/>
+            <img src="/chatpng.png" className='w-12 h-12'/>
             <span className="text-white font-bold ml-3 text-xl">ChatCircuit</span>
             <div className='relative py-2 group'>
                 <img src={assets.menu_icon} className='max-h-5 cursor-pointer'/>
