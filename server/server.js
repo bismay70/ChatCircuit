@@ -40,6 +40,7 @@ app.use(express.json({ limit: "4mb" }));
 const allowedOrigins = [
 
   "http://localhost:5173",
+  "https://chat-circuit-yes-client.vercel.app/",
 ];
 
 app.use(
