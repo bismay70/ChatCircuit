@@ -38,9 +38,8 @@ io.on("connection", (socket) => {
 //middlewares
 app.use(express.json({ limit: "4mb" }));
 const allowedOrigins = [
-
   "http://localhost:5173",
-  "https://chat-circuit-yes-client.vercel.app/",
+  "https://chat-circuit-yes-client.vercel.app",
 ];
 
 app.use(
@@ -63,7 +62,8 @@ app.use(
   })
 );
 
-// app.options("*", cors());
+// Enable pre-flight for all routes
+app.options("*", cors());
 
 //routes setup
 app.get("/", (req, res) => res.send("Server is running")); // Root route
