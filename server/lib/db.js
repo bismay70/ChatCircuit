@@ -24,7 +24,9 @@ export const connectDB = async () => {
             bufferCommands: false,
         };
 
-        cached.promise = mongoose.connect(`${MONGODB_URI}/chat-circuit`, opts).then((mongoose) => {
+        // Remove trailing slash from MONGODB_URI if it exists before appending the database name
+        const baseUri = MONGODB_URI.endsWith('/') ? MONGODB_URI.slice(0, -1) : MONGODB_URI;
+        cached.promise = mongoose.connect(`${baseUri}/chat-circuit`, opts).then((mongoose) => {
             console.log('Database connected');
             return mongoose;
         });

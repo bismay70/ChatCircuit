@@ -38,8 +38,7 @@ io.on("connection", (socket) => {
 //middlewares
 app.use(express.json({ limit: "4mb" }));
 const allowedOrigins = [
-  "https://chat-circuit-client-git-main-bismay70s-projects.vercel.app",
-  "https://chat-circuit-client.vercel.app", // Add production URL if known
+
   "http://localhost:5173",
 ];
 
@@ -49,9 +48,8 @@ app.use(
       // allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
 
-      // Check if the origin matches any allowed origin or is a subset (like a vercel preview deployment)
-      // For simplicity, we'll allow all vercel.app subdomains for this user's project to avoid future errors with new deployments
-      if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith("-bismay70s-projects.vercel.app")) {
+      // Check if the origin matches any allowed origin
+      if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
         console.log("Blocked by CORS:", origin);
@@ -59,12 +57,12 @@ app.use(
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "token"],
     credentials: true,
   })
 );
 
-app.options("*", cors());
+// app.options("*", cors());
 
 //routes setup
 app.get("/", (req, res) => res.send("Server is running")); // Root route
@@ -78,10 +76,11 @@ app.use("/api/messages", messageRouter);
 // We'll wrap it in a function to be safe and call it.
 connectDB().catch(console.error);
 
-if (process.env.NODE_ENV !== "production") {
-  const PORT = process.env.PORT || 5000;
-  server.listen(PORT, () => console.log("Server on port: " + PORT));
-}
-
+// if (process.env.NODE_ENV !== "production") {
+//   const PORT = process.env.PORT || 5000;
+//   server.listen(PORT, () => console.log("Server on port: " + PORT));
+// }
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log("Server on port: " + PORT));
 // Export "app" for Vercel, not "server"
 export default app;

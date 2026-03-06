@@ -42,7 +42,6 @@ export const ChatProvider = ({ children }) => {
     }
 
     //func to send messages with selected user
-
     const sendMessage = async (messageData) => {
         try {
             const { data } = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData);
@@ -56,6 +55,35 @@ export const ChatProvider = ({ children }) => {
         }
     }
 
+    //func to edit a message
+    const editMessage = async (messageId, newText) => {
+        try {
+            const { data } = await axios.put(`/api/messages/edit/${messageId}`, { text: newText });
+            if (data.success) {
+                setMessages(messages.map(msg => msg._id === messageId ? data.message : msg));
+                toast.success("Message updated");
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+    //func to delete a message
+    const deleteMessage = async (messageId) => {
+        try {
+            const { data } = await axios.delete(`/api/messages/delete/${messageId}`);
+            if (data.success) {
+                setMessages(messages.filter(msg => msg._id !== messageId));
+                toast.success("Message deleted");
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
 
     // func to subscribe to msgs for slected users
     const subscribeToMessages = async () => {
@@ -108,8 +136,23 @@ export const ChatProvider = ({ children }) => {
 
         socket.on("newMessage", handleNewMessage);
 
+        const handleEditMessage = (updatedMessage) => {
+            if (selectedUser && updatedMessage.senderId === selectedUser._id) {
+                setMessages((prev) => prev.map(msg => msg._id === updatedMessage._id ? updatedMessage : msg));
+            }
+        };
+
+        const handleDeleteMessage = (deletedMessageId) => {
+            setMessages((prev) => prev.filter(msg => msg._id !== deletedMessageId));
+        };
+
+        socket.on("editMessage", handleEditMessage);
+        socket.on("deleteMessage", handleDeleteMessage);
+
         return () => {
             socket.off("newMessage", handleNewMessage);
+            socket.off("editMessage", handleEditMessage);
+            socket.off("deleteMessage", handleDeleteMessage);
         };
     }, [socket, selectedUser]);
 
@@ -122,6 +165,8 @@ export const ChatProvider = ({ children }) => {
         getUsers,
         getMessages,
         sendMessage,
+        editMessage,
+        deleteMessage,
         unseenMessages,
         setUnseenMessages,
         

@@ -1,48 +1,48 @@
 import Message from "../models/Message.js";
 import User from "../models/User.js";
 import cloudinary from "../lib/cloudinary.js";
-import {io,userSocketMap} from "../server.js";
+import { io, userSocketMap } from "../server.js";
 
 //get all  usrs excpet logged in user
-export const getUsersForSidebar= async (req,res)=>{
-try{
-    const userId =  req.user._id;
-    const filteredusers = await User.find({_id:{$ne:userId}}).select("-password");
+export const getUsersForSidebar = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const filteredusers = await User.find({ _id: { $ne: userId } }).select("-password");
 
-    // count no of unseen msgs
-    const unseenMessages = {}
-    const promises = filteredusers.map(async (user) => {
-        const messages = await Message.find({senderId:user._id,receiverId:userId,seen:false});
-        if(messages.length > 0){
-            unseenMessages[user._id] = messages.length;
-        }
+        // count no of unseen msgs
+        const unseenMessages = {}
+        const promises = filteredusers.map(async (user) => {
+            const messages = await Message.find({ senderId: user._id, receiverId: userId, seen: false });
+            if (messages.length > 0) {
+                unseenMessages[user._id] = messages.length;
+            }
 
-    })
-    await Promise.all(promises);
+        })
+        await Promise.all(promises);
 
-    res.json({success:true,users:filteredusers,unseenMessages});
-}catch(error){
-console.log(error.message)
-res.json({success:false,message:error.message})
-}
+        res.json({ success: true, users: filteredusers, unseenMessages });
+    } catch (error) {
+        console.log(error.message)
+        res.json({ success: false, message: error.message })
+    }
 }
 
 
 
 // get all msgs for selcted users
-export const getMessages =  async (req,res)=>{
-    try{
-        const {id:selectedUserId}=req.params;
+export const getMessages = async (req, res) => {
+    try {
+        const { id: selectedUserId } = req.params;
         const myId = req.user._id;
 
-        const messages = await Message.find({$or:[{senderId:selectedUserId,receiverId:myId},{senderId:myId,receiverId:selectedUserId}]});
+        const messages = await Message.find({ $or: [{ senderId: selectedUserId, receiverId: myId }, { senderId: myId, receiverId: selectedUserId }] });
 
-        await Message.updateMany({senderId:selectedUserId,receiverId:myId},{seen:true});
+        await Message.updateMany({ senderId: selectedUserId, receiverId: myId }, { seen: true });
 
-        res.json({success:true,messages});
-    }catch(error){
+        res.json({ success: true, messages });
+    } catch (error) {
         console
-        res.json({success:false,message:error.message})
+        res.json({ success: false, message: error.message })
 
     }
 }
@@ -50,46 +50,109 @@ export const getMessages =  async (req,res)=>{
 
 //api to mark msgs as seen using msg id
 
-export const markMessageAsSeen = async (req,res)=>{
-    try{
-        const {id}=req.params;
-        await Message.findByIdAndUpdate(id,{seen:true});
-        res.json({success:true});
-    }catch(error){
+export const markMessageAsSeen = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Message.findByIdAndUpdate(id, { seen: true });
+        res.json({ success: true });
+    } catch (error) {
         console.log(error.message)
-        res.json({success:false,message:error.message})
+        res.json({ success: false, message: error.message })
     }
 }
 
 
 
 //send msg to selected user
-export const sendMessage = async (req,res)=>{
-    try{
-        const {text,image} = req.body;
+export const sendMessage = async (req, res) => {
+    try {
+        const { text, image } = req.body;
         const receiverId = req.params.id;
         const senderId = req.user._id;
 
         let imageUrl;
 
-        if(image){
+        if (image) {
             const uploadResponse = await cloudinary.uploader.upload(image);
             imageUrl = uploadResponse.secure_url
         }
 
-        const newMessage = await Message.create({senderId,receiverId,text,image:imageUrl});
+        const newMessage = await Message.create({ senderId, receiverId, text, image: imageUrl });
 
-// emit new msg to receiver's socket
+        // emit new msg to receiver's socket
         const receiverSocketId = userSocketMap[receiverId];
-        if(receiverSocketId){
-            io.to(receiverSocketId).emit("newMessage",newMessage);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", newMessage);
         }
 
-        res.json({success:true,newMessage});
-    }catch(error){
+        res.json({ success: true, newMessage });
+    } catch (error) {
         console.log(error.message)
-        res.json({success:false,message:error.message})
+        res.json({ success: false, message: error.message })
     }
 }
 
 
+//edit message
+export const editMessage = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { text } = req.body;
+        const senderId = req.user._id;
+
+        const message = await Message.findById(id);
+
+        if (!message) {
+            return res.json({ success: false, message: "Message not found" });
+        }
+
+        if (message.senderId.toString() !== senderId.toString()) {
+            return res.json({ success: false, message: "Unauthorized to edit this message" });
+        }
+
+        message.text = text;
+        await message.save();
+
+        // Emit updated message to receiver
+        const receiverSocketId = userSocketMap[message.receiverId];
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("editMessage", message);
+        }
+
+        res.json({ success: true, message });
+    } catch (error) {
+        console.log(error.message);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+//delete message
+export const deleteMessage = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const senderId = req.user._id;
+
+        const message = await Message.findById(id);
+
+        if (!message) {
+            return res.json({ success: false, message: "Message not found" });
+        }
+
+        if (message.senderId.toString() !== senderId.toString()) {
+            return res.json({ success: false, message: "Unauthorized to delete this message" });
+        }
+
+        await Message.findByIdAndDelete(id);
+
+        // Emit delete event to receiver
+        const receiverSocketId = userSocketMap[message.receiverId];
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("deleteMessage", id);
+        }
+
+        res.json({ success: true, message: "Message deleted" });
+    } catch (error) {
+        console.log(error.message);
+        res.json({ success: false, message: error.message });
+    }
+}

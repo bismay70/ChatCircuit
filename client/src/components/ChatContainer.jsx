@@ -7,14 +7,16 @@ import { toast } from 'react-hot-toast';
 
 const ChatContainer = () => {
 
-  const {selectedUser,setSelectedUser,messages,sendMessage,getMessages} = useContext(ChatContext);
+  const {selectedUser,setSelectedUser,messages,sendMessage,getMessages,editMessage,deleteMessage} = useContext(ChatContext);
 
   const {authUser,onlineUsers} = useContext(AuthContext)
 
   const scrollEnd = useRef();
 
 const [input,setInput] = useState("");
-
+const [editingMessageId, setEditingMessageId] = useState(null);
+const [editInput, setEditInput] = useState("");
+const [activeDropdown, setActiveDropdown] = useState(null);
 
 //handle sending a msg
 const handleSendMessage = async (e)=>{
@@ -22,6 +24,15 @@ const handleSendMessage = async (e)=>{
   if(input.trim() === "") return null;
   await sendMessage({text:input.trim()});
   setInput("");
+}
+
+//handle editing a msg
+const handleEditMessage = async (e, msgId) => {
+  e.preventDefault();
+  if(editInput.trim() === "") return null;
+  await editMessage(msgId, editInput.trim());
+  setEditingMessageId(null);
+  setEditInput("");
 }
 
 //handle sending an img
@@ -65,21 +76,55 @@ useEffect(()=>{
           )}
         </p>
         <img onClick={()=>setSelectedUser(null)} src={assets.arrow_icon} className="md:hidden max-w-7"/>
-        <img src={assets.help_icon} className="max-md:hidden max-w-5"/>
       </div>
 
       <div className="flex flex-col h-[calc(100%-120px)] overflow-y-scroll p-3 pb-6">
       {messages.map((msg,index)=>(
-        <div key={index} className={`flex items-end gap-2 justify-end ${msg.senderId !== authUser._id && 'flex-row-reverse'}`}>
+        <div key={index} className={`flex items-end gap-2 justify-end ${msg.senderId !== authUser._id && 'flex-row-reverse'} mb-8 group`}>
           {msg.image ? (
-            <img src={msg.image} className="max-w-[230px] border border-gray-700 rounded-lg overflow-hidden mb-8"/>
+            <div className="relative">
+              <img src={msg.image} className="max-w-[230px] border border-gray-700 rounded-lg overflow-hidden"/>
+              {msg.senderId === authUser._id && (
+                <div className="absolute top-2 right-2 bg-black/50 p-1 block opacity-0 group-hover:opacity-100 transition-opacity rounded cursor-pointer" onClick={() => deleteMessage(msg._id)}>
+                  🗑️
+                </div>
+              )}
+            </div>
           ) :
           (
-            <p className={`p-2 max-w-[200px] md:text-sm font-light rounded-lg mb-8 break-all bg-violet-500/30 text-white ${msg.senderId === authUser._id ? 'rounded-br-none' : 'rounded-bl-none'}`}>{msg.text}</p>
+            <div className={`relative p-2 max-w-[200px] md:text-sm font-light rounded-lg break-all ${msg.senderId === authUser._id ? 'bg-violet-500/30 text-white rounded-br-none' : 'bg-gray-700 text-white rounded-bl-none'}`}>
+              
+              {editingMessageId === msg._id ? (
+                <form onSubmit={(e) => handleEditMessage(e, msg._id)} className="flex items-center gap-2">
+                  <input type="text" autoFocus value={editInput} onChange={(e) => setEditInput(e.target.value)} className="bg-transparent border-b outline-none w-full" />
+                  <button type="submit" className="text-xs shrink-0 text-green-400">Save</button>
+                  <button type="button" onClick={() => setEditingMessageId(null)} className="text-xs shrink-0 text-red-400">X</button>
+                </form>
+              ) : (
+                <>
+                  <p>{msg.text}</p>
+                  
+                  {msg.senderId === authUser._id && (
+                    <div className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1 z-10">
+                      <button onClick={() => { setActiveDropdown(msg._id === activeDropdown ? null : msg._id) }} className="text-gray-400 hover:text-white">
+                        ⋮
+                      </button>
+                      
+                      {activeDropdown === msg._id && (
+                        <div className="absolute top-6 left-0 bg-gray-800 border border-gray-700 rounded shadow-lg p-1 text-xs w-20 flex flex-col">
+                          <button onClick={() => { setEditingMessageId(msg._id); setEditInput(msg.text); setActiveDropdown(null); }} className="p-1 hover:bg-gray-700 text-left text-white">Edit</button>
+                          <button onClick={() => { deleteMessage(msg._id); setActiveDropdown(null); }} className="p-1 hover:bg-gray-700 text-left text-red-400">Delete</button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           )}
           <div className='text-center text-xs'>
             <img src={msg.senderId === authUser._id ? authUser?.profilePic || assets.avatar_icon : selectedUser?.profilePic || assets.avatar_icon } className='w-7 rounded-full'/>
-            <p className="text-gray-500">{formatMessageTime(msg.createdAt)}</p>
+            <p className="text-gray-300">{formatMessageTime(msg.createdAt)}</p>
           </div>
         </div>
       ))}
@@ -103,7 +148,7 @@ useEffect(()=>{
   )
   : (
     <div className='flex flex-col justify-center items-center gap-2 text-gray-500'>
-      <img src={assets.logo_icon} className='max-w-16'/>
+      <img src="/chat.jpg" className='w-24 h-24 rounded-[30%] shadow-lg'/>
       <p className="text-lg font-medium text-white">Chat anytime,anywhere</p>
       </div>
   )
